@@ -1,10 +1,12 @@
-from flask import Flask, render_template, redirect, url_for, session
+from flask import Flask, render_template, redirect, url_for, session, request, jsonify
 import random
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 inner_pages = {'page1', 'page2', 'page3'}
+
+pinLogin = ""
 
 @app.route('/')
 def index():
@@ -32,11 +34,49 @@ def navigate(page):
         visited.append(page)
         session['visited'] = visited
 
+    print(visited)
     return render_template(f"{page}.html")
 
 @app.route('/done')
 def done():
     return render_template('done.html')
+
+@app.route('/pin')
+def pin():
+    # Phase can be "create" or "validate"
+    phase = session.get('phase', 'create')
+    return render_template('pin.html', login=(phase == 'validate'))
+
+@app.route('/submit_pin', methods=['POST'])
+def submit_pin():
+    data = request.json
+    pin = data.get('pin')
+
+    phase = session.get('phase', 'create')
+
+    if phase == 'create':
+        # Store and move to delay
+        session['pin'] = pin
+        session['phase'] = 'validate'
+        return jsonify({'next': url_for('delay')})
+
+    elif phase == 'validate':
+        if pin == session.get('pin'):
+            # Clear PIN and phase after successful login
+            return jsonify({'success': True, 'next': url_for('go_to_next')})
+        else:
+            return jsonify({'success': False, 'error': 'Incorrect PIN'})
+
+@app.route('/delay')
+def delay():
+    return render_template('delay.html')
+
+@app.route('/reset_pin')
+def reset_pin():
+    visited = session['visited']
+    session.clear()
+    session['visited'] = visited
+    return redirect(url_for('pin'))
 
 if __name__ == '__main__':
     app.run(debug=True)

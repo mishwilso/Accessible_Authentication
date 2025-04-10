@@ -2,7 +2,14 @@
 <html>
 <head><title>Page 1</title></head>
 <body>
-    <h1>This is Page 1</h1>
-    <a href="{{ url_for('go_to_next') }}">Go to next random unvisited page</a>
+    <h1>Text-Based Authentication </h1>
+    <p>Goal: Evaluate the usability and memorability of user-generated PIN input systems. </p>
+    <p>Procedure:</p>
+    <ul>
+        <li>Participants are prompted to create their own 4-digit PIN and confirm it.</li>
+        <li>After a delay task, the system presents a login screen where they must enter the PIN they created.</li>
+        <li>Time, error rate, and number of attempts will be recorded.</li>
+    </ul>
+    <a href="{{ url_for('reset_pin') }}">Go to PIN Login</a>
 </body>
 </html>

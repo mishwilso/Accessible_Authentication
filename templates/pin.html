@@ -1,0 +1,59 @@
+<!-- /** To be filled later /
+/***************************************************************************************
+*    Title: <title of program/source code>
+*    Author: <author(s) names>
+*    Date: <date>
+*    Code version: <code version>
+*    Availability: <where it's located>
+*
+***************************************************************************************/
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title> Pin Screen </title>
+	<link rel="stylesheet" href="static/style.css">
+	<script type="module" src="static/main.js"></script>
+</head>
+<body>
+
+    {% if login == False %}
+    <div id="mainPinScreen" class="pin-screen">
+		<input type="password" class="pin-value" readonly>
+		<hr class="pin-divider">
+		<div class="pin-keyboard">
+			<button type="button" class="pin-keyboard-key">1</button>
+			<button type="button" class="pin-keyboard-key">2</button>
+			<button type="button" class="pin-keyboard-key">3</button>
+			<button type="button" class="pin-keyboard-key">4</button>
+			<button type="button" class="pin-keyboard-key">5</button>
+			<button type="button" class="pin-keyboard-key">6</button>
+			<button type="button" class="pin-keyboard-key">7</button>
+			<button type="button" class="pin-keyboard-key">8</button>
+			<button type="button" class="pin-keyboard-key">9</button>
+			<button type="button" class="pin-keyboard-key pin-keyboard-key--clear">
+				<ion-icon name="close-outline"></ion-icon>
+			</button>
+			<button type="button" class="pin-keyboard-key">0</button>
+			<button type="button" class="pin-keyboard-key pin-keyboard-key--enter">
+				<ion-icon name="arrow-forward-circle-outline"></ion-icon>
+			</button>
+		</div>
+	</div>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+	<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    {% else %}
+    
+    <p>Password has been created!! </p>
+
+    <a href="{{ url_for('go_to_next') }}">Go to next random unvisited page</a>
+
+    {% endif %}
+
+</body>
+</html>

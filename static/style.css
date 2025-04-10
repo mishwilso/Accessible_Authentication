@@ -1,0 +1,66 @@
+/** To be filled later /
+/***************************************************************************************
+*    Title: <title of program/source code>
+*    Author: <author(s) names>
+*    Date: <date>
+*    Code version: <code version>
+*    Availability: <where it's located>
+*
+***************************************************************************************/
+
+body {
+	margin: 32px;
+	background: #009578;
+}
+
+.pin-screen {
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	padding: 16px;
+	gap: 16px;
+	border-radius: 8px;
+	width: 300px;
+	background: #ffffff;
+}
+
+.pin-value {
+	outline: none;
+	border: none;
+	background: transparent;
+	text-align: center;
+	font-size: 32px;
+	letter-spacing: 4px;
+}
+
+.pin-divider {
+	height: 1px;
+	width: 100%;
+	border: none;
+	background: #009578;
+	margin: 0;
+}
+
+.pin-keyboard {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+}
+
+.pin-keyboard-key {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 48px;
+	cursor: pointer;
+	font-family: 'Lexend', sans-serif;
+	font-size: 22px;
+	color: #555555;
+	background: #ffffff;
+	border: 2px solid #eeeeee;
+	border-radius: 4px;
+}
+
+.pin-keyboard-key:active {
+	background: #eeeeee;
+}

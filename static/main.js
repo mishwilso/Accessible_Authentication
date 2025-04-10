@@ -7,7 +7,11 @@
 *    Availability: <where it's located>
 *
 ***************************************************************************************/
+// import PatternLock from '@phenax/pattern-lock-js';
+// import PatternLock from 'patternlock';
+// import 'patternlock/dist/patternlock.css'; 
 
+// =================== PIN LOCK ===================
 const initPinScreen = (selector, onEnter) => {
 	const container = document.querySelector(selector);
 	const input = container.querySelector(".pin-value");
@@ -53,3 +57,6 @@ initPinScreen("#mainPinScreen", (pin, clear) => {
 	console.log(`Entered Pin: ${pin}`);
 	clear();
 });
+
+// ============== PATTERN LOCK ===============
+

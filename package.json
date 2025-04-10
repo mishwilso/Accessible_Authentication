@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@phenax/pattern-lock-js": "^0.1.2",
+    "pattern-lock-js": "^1.0.1",
+    "patternlock": "^2.0.2"
+  }
+}

@@ -47,10 +47,15 @@ def pin():
     phase = session.get('phase', 'create')
     return render_template('pin.html', login=(phase == 'validate'))
 
+@app.route('/pattern')
+def pattern():
+    return render_template('pattern.html')
+
 @app.route('/submit_pin', methods=['POST'])
 def submit_pin():
     data = request.json
     pin = data.get('pin')
+    print(f"PIN: {pin}")
 
     phase = session.get('phase', 'create')
 

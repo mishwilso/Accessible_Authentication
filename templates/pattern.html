@@ -1,63 +1,107 @@
-<!-- /** To be filled later /
-/***************************************************************************************
-*    Title: <title of program/source code>
-*    Author: <author(s) names>
-*    Date: <date>
-*    Code version: <code version>
-*    Availability: <where it's located>
-*
-***************************************************************************************/
--->
+<html><head>
+	<title>Pattern lock for the web</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+	<style>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title> Pattern Screen </title>
-	<!-- <link rel="stylesheet" href="static/style.css">
-	<script type="module" src="static/main.js"></script> -->
-    <link rel="stylesheet" href="patternlock.min.css">
-<script src="patternlock.min.js" charset="utf-8"></script>
+		html *, * {
+			box-sizing: border-box;
+		}
+
+		html, body {
+			margin: 0;
+			padding: 0;
+			background-color: #fff;
+			color: #2c3e50;
+			font-family: Helvetica, "sans-serif";
+		}
+
+		button {
+			outline: none;
+			border: none;
+			background-color: #ddd;
+			cursor: pointer;
+		}
+
+		.pattern-container {
+			text-align: center;
+			max-width: 600px;
+			margin: 0 auto;
+			padding: 1em;
+		}
+
+		.title {
+			font-size: 1.6em;
+			text-align: left;
+			padding: 1em 0 0;
+		}
+
+		.subtitle {
+			font-size: 1.1em;
+			opacity: .8;
+			text-align: left;
+		}
+
+		.canvas-wrapper {
+			padding: 2em 0;
+		}
+
+		.password {
+			padding: 1em 0;
+		}
+
+		.controls-wrapper {
+			padding: 1em;
+			border: 1px solid #eee;
+			margin: 1em auto;
+			text-align: left;
+		}
+
+		.button-primary {
+			padding: 1em 1.3em;
+			background-color: #0c1e30;
+			color: #fff;
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+	</style>
 </head>
-<body>
-<div>
-    <svg class="patternlock" id="lock" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <g class="lock-actives"></g>
-        <g class="lock-lines"></g>
-        <g class="lock-dots">
-            <circle cx="20" cy="20" r="2"/>
-            <circle cx="50" cy="20" r="2"/>
-            <circle cx="80" cy="20" r="2"/>
+<body data-new-gr-c-s-check-loaded="14.1229.0" data-gr-ext-installed="" data-new-gr-c-s-loaded="14.1229.0">
 
-            <circle cx="20" cy="50" r="2"/>
-            <circle cx="50" cy="50" r="2"/>
-            <circle cx="80" cy="50" r="2"/>
 
-            <circle cx="20" cy="80" r="2"/>
-            <circle cx="50" cy="80" r="2"/>
-            <circle cx="80" cy="80" r="2"/>
-        </g>
-    </svg>
+<div class="pattern-container">
+	<div id="root"><div><div class="title">PatternLockJS</div>
+    <div class="subtitle">Draw unlock pattern to generate a hash</div>
+    <div class="canvas-wrapper">
+        <canvas width="375" height="537" style="width: 300px; height: 430px;"></canvas>
+    </div>
+    <div class="password">Generated hash: <input fdprocessedid="yhir39"></div>
+    <button class="button-primary" fdprocessedid="6zb18">Hide Controls</button>
+    <div class="controls-wrapper">
+        <div style="position: relative; font-size: 0.9em; text-align: left; padding: 2em; background-color: rgb(44, 62, 80); color: rgb(238, 238, 238); font-family: &quot;Courier New&quot;, Courier, monospace; font-weight: bold;">
+            <div>
+                <span style="color: rgb(203, 137, 230);">const</span> lock = 
+                <span style="color: rgb(26, 188, 220);">PatternLock</span>
+                ({<div style="padding-left: 28px;"><span style="color: rgb(219, 105, 111);">$canvas</span>: 
+                    <span>document.
+                        <span style="color: rgb(26, 188, 220);">getElementById</span>(
+                        <span style="color: rgb(136, 202, 95);">"myCanvas"</span>)
+                    </span>,</div><div style="padding-left: 28px;">
+                        <span style="color: rgb(219, 105, 111);">width</span>: 
+                        <span style="color: rgb(136, 202, 95);">300</span>,</div>
+                        <div style="padding-left: 28px;"><span style="color: rgb(219, 105, 111);">height</span>: 
+                            <span style="color: rgb(136, 202, 95);">430</span>,</div><div style="padding-left: 28px;">
+                                <span style="color: rgb(219, 105, 111);">grid</span>: <span style="color: rgb(136, 202, 95);">[3,3]</span>,</div><div style="padding-left: 28px;"><span style="color: rgb(219, 105, 111);">theme</span>: <span style="color: rgb(136, 202, 95);">"dark"</span>,</div>});</div>
+                    <button data-clipboard-text="const lock = PatternLock({
+    $canvas: document.getElementById(&quot;myCanvas&quot;),
+    width: 300,
+    height: 430,
+    grid: [3,3],
+    theme: &quot;dark&quot;,
+});" class="copybtn" fdprocessedid="yq7du" style="position: absolute; right: 0px; top: 0px; border: 1px solid rgb(0, 17, 17); background: rgb(12, 30, 48); color: rgb(255, 255, 255); border-radius: 0px 0px 0px 10px; font-size: 0.8em; padding: 0.3em 1em;">Copy Code</button></div><div style="padding: 1em 0.3em;"><div style="padding: 1em 0px;"><div style="font-size: 1.3em;"><strong>Grid</strong></div><div><label style="padding: 0.3em 0.5em;"><input name="Grid" type="radio">2,2</label><label style="padding: 0.3em 0.5em;"><input name="Grid" type="radio">3,3</label><label style="padding: 0.3em 0.5em;"><input name="Grid" type="radio">3,4</label><label style="padding: 0.3em 0.5em;"><input name="Grid" type="radio">4,4</label><label style="padding: 0.3em 0.5em;"><input name="Grid" type="radio">4,5</label></div></div><div style="padding: 1em 0px;"><div style="font-size: 1.3em;"><strong>Theme</strong></div><div><label style="padding: 0.3em 0.5em;"><input name="Theme" type="radio">dark</label><label style="padding: 0.3em 0.5em;"><input name="Theme" type="radio">light</label></div></div><div style="padding: 1em 0px;"><div style="font-size: 1.3em;"><strong>Theme State</strong></div><div><label style="padding: 0.3em 0.5em;"><input name="Theme State" type="radio">default</label><label style="padding: 0.3em 0.5em;"><input name="Theme State" type="radio">success</label><label style="padding: 0.3em 0.5em;"><input name="Theme State" type="radio">failure</label></div></div></div></div><div style="padding: 5em;"></div></div></div>
 </div>
 
+<script src="https://phenax.github.io/pattern-lock-js/build/vanilla.example.js"></script>
 
-<!-- build:js vendor.js -->
-<script src="bower_components/jquery/dist/jquery.js" charset="utf-8"></script>
-<!-- endbuild -->
 
-<!-- build:js patternlock.js -->
-<script src="patternlock.js" charset="utf-8"></script>
-<!-- endbuild -->
-
-<script type="text/javascript">
-var e = document.getElementById('lock')
-var p = new PatternLock(e, {
-    onPattern: function() {
-        this.success()
-    }
-});
-</script>
-
-</body>
-</html>
+<span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span></body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>

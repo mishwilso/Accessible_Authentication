@@ -68,8 +68,10 @@ def submit_pin():
     elif phase == 'validate':
         if pin == session.get('pin'):
             # Clear PIN and phase after successful login
+            print("Good job! Pin success :)")
             return jsonify({'success': True, 'next': url_for('go_to_next')})
         else:
+            print("Sorry! Pin failure :'(")
             return jsonify({'success': False, 'error': 'Incorrect PIN'})
 
 @app.route('/delay')

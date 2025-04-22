@@ -7,6 +7,7 @@ app.secret_key = "supersecretkey"
 inner_pages = {'page1', 'page2', 'page3'}
 
 pinLogin = ""
+patternLogin = ""
 
 @app.route('/')
 def index():
@@ -47,10 +48,6 @@ def pin():
     phase = session.get('phase', 'create')
     return render_template('pin.html', login=(phase == 'validate'))
 
-@app.route('/pattern')
-def pattern():
-    return render_template('pattern.html')
-
 @app.route('/submit_pin', methods=['POST'])
 def submit_pin():
     data = request.json
@@ -74,9 +71,33 @@ def submit_pin():
             print("Sorry! Pin failure :'(")
             return jsonify({'success': False, 'error': 'Incorrect PIN'})
 
+@app.route('/pattern')
+def pattern():
+    phase = session.get('phase', 'create')
+    return render_template('pattern.html', login=(phase == 'validate'))
+
+@app.route('/submit_pattern', methods=['POST'])
+def submit_pattern():
+    data = request.json
+    pattern = data.get('pattern')
+    phase = session.get('phase', 'create')
+
+    if phase == 'create':
+        session['pattern'] = pattern
+        session['phase'] = 'validate'
+        return jsonify({'status': 'saved', 'next': url_for('delay')})
+
+    elif phase == 'validate':
+        if pattern == session.get('pattern'):
+            return jsonify({'success': True, 'next': url_for('reset_pattern')})
+        else:
+            return jsonify({'success': False, 'error': 'Incorrect pattern. Try again.'})
+
+
 @app.route('/delay')
 def delay():
-    return render_template('delay.html')
+    referrer = request.referrer or url_for('pin')
+    return render_template('delay.html', return_url=referrer)
 
 @app.route('/reset_pin')
 def reset_pin():
@@ -84,6 +105,13 @@ def reset_pin():
     session.clear()
     session['visited'] = visited
     return redirect(url_for('pin'))
+
+@app.route('/reset_pattern')
+def reset_pattern():
+    visited = session['visited']
+    session.clear()
+    session['visited'] = visited
+    return redirect(url_for('pattern'))
 
 if __name__ == '__main__':
     app.run(debug=True)

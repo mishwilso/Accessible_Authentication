@@ -5,6 +5,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 inner_pages = {'page1', 'page2', 'page3'}
+delay_pages = {'video1.mp4', 'video2.mp4'}
 
 pinLogin = ""
 patternLogin = ""
@@ -60,6 +61,7 @@ def submit_pin():
         # Store and move to delay
         session['pin'] = pin
         session['phase'] = 'validate'
+        session['video'] = random.choice(list(delay_pages))
         return jsonify({'next': url_for('delay')})
 
     elif phase == 'validate':
@@ -96,8 +98,9 @@ def submit_pattern():
 
 @app.route('/delay')
 def delay():
+    mp4 = session.get('video')
     referrer = request.referrer or url_for('pin')
-    return render_template('delay.html', return_url=referrer)
+    return render_template('delay.html', video=mp4, return_url=referrer)
 
 @app.route('/reset_pin')
 def reset_pin():

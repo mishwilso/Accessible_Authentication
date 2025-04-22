@@ -5,7 +5,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 inner_pages = {'page1', 'page2', 'page3'}
-delay_pages = {'video1.mp4', 'video2.mp4'}
+delay_pages = { 'video2.mp4', 'video2.mp4', 'video2.mp4', 'video2.mp4'}
 
 pinLogin = ""
 

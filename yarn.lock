@@ -4,7 +4,7 @@
 
 "@phenax/pattern-lock-js@^0.1.2":
   version "0.1.2"
-  resolved "https://registry.npmjs.org/@phenax/pattern-lock-js/-/pattern-lock-js-0.1.2.tgz"
+  resolved "https://registry.yarnpkg.com/@phenax/pattern-lock-js/-/pattern-lock-js-0.1.2.tgz#56760f661ed509d8a29062629a0349617ff45364"
   integrity sha512-azp2JCvV10Njh6YzTCZ6paCQvqbi/gBnPXe2himaCiLukradkwK7yskdzOW9ITRCBx0CFtL/+N0g0NW3O5Sy0w==
 
 jquery@^3.2.1, jquery@^3.3.1:
@@ -14,7 +14,7 @@ jquery@^3.2.1, jquery@^3.3.1:
 
 pattern-lock-js@^1.0.1:
   version "1.0.1"
-  resolved "https://registry.npmjs.org/pattern-lock-js/-/pattern-lock-js-1.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/pattern-lock-js/-/pattern-lock-js-1.0.1.tgz#953927a49b9710daa84cb6bdeaa9a1c3407c3cb5"
   integrity sha512-ePP8qxTfR14UD4ksoR+E4UmUEsSXNgv4UkS14FWZMeMQuihct5qQhIYrpAZduKWJeuhRcHnJz0eYzwaXIF/CXA==
   dependencies:
     jquery "^3.2.1"

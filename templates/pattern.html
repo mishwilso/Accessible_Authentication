@@ -1,74 +1,130 @@
-<html><head>
-	<title>Pattern lock for the web</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pattern Lock</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" charset="utf-8"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='patternlock.min.css') }}">
+  <script src="{{ url_for('static', filename='patternlock.min.js') }}"></script>
 	<style>
-
-		html *, * {
-			box-sizing: border-box;
-		}
-
-		html, body {
-			margin: 0;
-			padding: 0;
-			background-color: #fff;
-			color: #2c3e50;
-			font-family: Helvetica, "sans-serif";
-		}
-
-		button {
-			outline: none;
-			border: none;
-			background-color: #ddd;
-			cursor: pointer;
-		}
-
-		.pattern-container {
+    body {
+      font-family: Arial, sans-serif;
 			text-align: center;
-			max-width: 600px;
-			margin: 0 auto;
-			padding: 1em;
+      margin-top: 40px;
 		}
 
-		.title {
-			font-size: 1.6em;
-			text-align: left;
-			padding: 1em 0 0;
+    .msg {
+      font-weight: bold;
+      margin-top: 20px;
 		}
 
-		.subtitle {
-			font-size: 1.1em;
-			opacity: .8;
-			text-align: left;
+    .next-btn {
+      display: none;
+      margin-top: 30px;
 		}
 
-		.canvas-wrapper {
-			padding: 2em 0;
-		}
+    .next-btn button {
+      padding: 10px 20px;
+      font-size: 16px;
+    }
 
-		.password {
-			padding: 1em 0;
-		}
-
-		.controls-wrapper {
-			padding: 1em;
-			border: 1px solid #eee;
-			margin: 1em auto;
-			text-align: left;
-		}
-
-		.button-primary {
-			padding: 1em 1.3em;
-			background-color: #0c1e30;
-			color: #fff;
-			font-weight: bold;
-			text-transform: uppercase;
+    #patternContainer {
+      width: 300px;
+      margin: 0 auto;
 		}
 	</style>
 </head>
-<body data-new-gr-c-s-check-loaded="14.1229.0" data-gr-ext-installed="" data-new-gr-c-s-loaded="14.1229.0">
+<body>
+
+  {% if login == False %}
+    <h2>Create Your Pattern</h2>
+    <p>Draw a pattern, then repeat it to confirm.</p>
+  {% else %}
+    <h2>Enter Your Pattern to Login</h2>
+    <p>Please draw the pattern you set earlier.</p>
+    <a href="{{ url_for('go_to_next') }}">Go to next survey incase you don't remember the Pattern</a>
+  {% endif %}
+
+  <div id="patternContainer">
+    <svg class="patternlock" id="lock" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <g class="lock-actives"></g>
+      <g class="lock-lines"></g>
+      <g class="lock-dots">
+        {% for y in [20, 50, 80] %}
+          {% for x in [20, 50, 80] %}
+            <circle cx="{{ x }}" cy="{{ y }}" r="2"/>
+          {% endfor %}
+        {% endfor %}
+      </g>
+    </svg>
+  </div>
+
+  <div class="msg" id="statusMsg"></div>
+
+  <div class="next-btn" id="nextBtn">
+	<button>Continue</button>
+  </div>
+  
+
+  <script>
+    let firstPattern = null;
+    let isCreating = {{ 'false' if login else 'true' }};
+    let lock = new PatternLock("#lock", {
+      onPattern: function(pattern) {
+        const status = document.getElementById("statusMsg");
+
+        if (isCreating) {
+          if (!firstPattern) {
+            firstPattern = pattern;
+            lock.clear();
+            status.textContent = "Now draw the pattern again to confirm.";
+          } else {
+            if (firstPattern === pattern) {
+              // Pattern confirmed – save to server
+              fetch("/submit_pattern", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ pattern })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success || data.status === 'saved') {
+					status.textContent = "Pattern saved";
+					const nextBtn = document.getElementById("nextBtn");
+					nextBtn.style.display = "block";
+					nextBtn.onclick = () => window.location.href = data.next; 
+					}
+              });
+            } else {
+              status.textContent = "Patterns didn’t match. Please try again.";
+              firstPattern = null;
+              lock.clear();
+            }
+          }
+        } else {
+          // Login validation phase
+          fetch("/submit_pattern", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ pattern })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              status.textContent = "Access granted";
+              setTimeout(() => window.location.href = data.next, 1000);
+            } else {
+              status.textContent = data.error || "Incorrect pattern";
+            }
+            lock.clear();
+          });
+        }
+      }
+    });
+  </script>
 
 
+<<<<<<< HEAD
 <div class="pattern-container">
 	<div id="root"><div><div class="title">PatternLockJS</div>
     <div class="subtitle">Draw unlock pattern to generate a hash</div>
@@ -106,3 +162,7 @@
 <a href="{{ url_for('go_to_next') }}">Go to next survey incase you don't remember the pattern</a>
 
 <span id="PING_IFRAME_FORM_DETECTION" style="display: none;"></span></body><grammarly-desktop-integration data-grammarly-shadow-root="true"></grammarly-desktop-integration></html>
+=======
+</body>
+</html>
+>>>>>>> 402a3b7f6f4a448343ea49ca9211ae94af5e18ed

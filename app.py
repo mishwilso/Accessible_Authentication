@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 inner_pages = {'page1', 'page2', 'page3'}
-delay_pages = {'video1.mp4', 'video2.mp4'}
+delay_pages = { 'video1.mp4', 'video2.mp4', 'video3.mp4'}
 
 pinLogin = ""
 patternLogin = ""
@@ -37,16 +37,21 @@ def index():
     session['distractors'] = []
     return render_template('index.html')
 
+
+# Currently index.html sends us to this page so differentiate with a specific survey page that is called instead of go_to_next
 @app.route('/next')
 def go_to_next():
     visited = session.get('visited', [])
     unvisited = list(inner_pages - set(visited))
 
     if not unvisited:
-        return redirect(url_for('done'))
+        next_page = url_for('done')
+    else:
+        next_page = url_for('navigate', page=random.choice(unvisited))
 
-    next_page = random.choice(unvisited)
-    return redirect(url_for('navigate', page=next_page))
+    return render_template('survey.html', page=next_page)
+
+    
 
 @app.route('/<page>')
 def navigate(page):
@@ -61,14 +66,24 @@ def navigate(page):
     print(visited)
     return render_template(f"{page}.html")
 
+
+
 @app.route('/done')
 def done():
     return render_template('done.html')
+
+
 
 @app.route('/pin')
 def pin():
     phase = session.get('pin_phase', 'create')
     return render_template('pin.html', login=(phase == 'login'))
+
+
+
+
+
+
 
 @app.route('/submit_pin', methods=['POST'])
 def submit_pin():
@@ -97,10 +112,21 @@ def submit_pin():
         else:
             return jsonify({'success': False, 'error': 'Incorrect PIN'})
 
+
+
+
 @app.route('/pattern')
 def pattern():
     phase = session.get('pattern_phase', 'create')
     return render_template('pattern.html', phase=phase)
+
+
+
+
+
+
+
+
 
 @app.route('/submit_pattern', methods=['POST'])
 def submit_pattern():
@@ -112,12 +138,14 @@ def submit_pattern():
 
     if phase == 'create':
         session['pattern'] = pattern
+        session['video'] = random.choice(list(delay_pages))
         session['pattern_phase'] = 'confirm'
         return jsonify({'status': 'confirm'})
 
     elif phase == 'confirm':
         if pattern == session.get('pattern'):
             session['pattern_phase'] = 'login'
+       
             return jsonify({'status': 'saved', 'next': url_for('delay')})
         else:
             session['pattern_phase'] = 'create'
@@ -128,6 +156,50 @@ def submit_pattern():
             return jsonify({'success': True, 'next': url_for('reset_pattern')})
         else:
             return jsonify({'success': False, 'error': 'Incorrect pattern. Try again.'})
+
+
+
+
+@app.route("/submit_image_login", methods=["POST"])
+def submit_image_login():
+    data = request.json
+    attempt = data.get("sequence")
+    correct = session.get("image_password", [])
+
+    if ORDERED_MATCH:
+        is_correct = attempt == correct
+    else:
+        is_correct = set(attempt) == set(correct)
+
+    if is_correct:
+        return jsonify({"success": True, "next": url_for("go_to_next")})
+    else:
+        return jsonify({"success": False, "message": "Incorrect images selected"})
+
+
+
+@app.route("/submit_image_password", methods=["POST"])
+def submit_image_password():
+    data = request.json
+    sequence = list(map(str, data.get("sequence")))  # make sure they're strings
+    phase = session.get("phase", "create")
+
+    if phase == "create":
+        session["image_password"] = sequence
+        session["phase"] = "confirm"
+        return jsonify({"status": "confirm"})
+
+    elif phase == "confirm":
+        stored = session.get("image_password", [])
+        if set(sequence) == set(stored):  # unordered comparison
+            session["phase"] = "login"
+            session['video'] = random.choice(list(delay_pages))
+            return jsonify({"status": "saved", "next": url_for("delay")})
+        else:
+            session["phase"] = "create"
+            return jsonify({"status": "mismatch"})
+
+
 
 @app.route("/image_password")
 def image_password():
@@ -205,12 +277,18 @@ def delay():
     referrer = request.referrer or url_for('pin')
     return render_template('delay.html', video=mp4, return_url=referrer)
 
+
+
+
 @app.route('/reset_pin')
 def reset_pin():
     visited = session['visited']
     session.clear()
     session['visited'] = visited
     return redirect(url_for('pin'))
+
+
+
 
 @app.route('/reset_pattern')
 def reset_pattern():
@@ -219,12 +297,16 @@ def reset_pattern():
     session['visited'] = visited
     return redirect(url_for('pattern'))
 
+
+
+
 @app.route("/reset_image_password")
 def reset_image_password():
     visited = session['visited']
     session.clear()
     session['visited'] = visited
     return redirect(url_for("image_password"))
+
 
 
 if __name__ == '__main__':

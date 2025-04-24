@@ -1,17 +1,8 @@
-// To be filled later
-/***************************************************************************************
-*    Title: <title of program/source code>
-*    Author: <author(s) names>
-*    Date: <date>
-*    Code version: <code version>
-*    Availability: <where it's located>
-*
-***************************************************************************************/
-// =================== PIN LOCK ===================
 const initPinScreen = (selector, onEnter) => {
 	const container = document.querySelector(selector);
 	const input = container.querySelector(".pin-value");
 	const keys = container.querySelectorAll(".pin-keyboard-key");
+	const status = document.getElementById("statusMsg");
 
 	const clear = () => {
 		input.value = "";
@@ -23,6 +14,7 @@ const initPinScreen = (selector, onEnter) => {
 
 			if (key.classList.contains("pin-keyboard-key--clear")) {
 				clear();
+				status.textContent = "";
 			} else if (key.classList.contains("pin-keyboard-key--enter")) {
 				if (input.value) {
 					fetch("/submit_pin", {
@@ -30,15 +22,28 @@ const initPinScreen = (selector, onEnter) => {
 						headers: {
 							"Content-Type": "application/json"
 						},
-						body: JSON.stringify({ pin: input.value })
+						body: JSON.stringify({
+							pin: input.value,
+							time_taken: getElapsedTime()
+						})
 					})
 					.then(res => res.json())
 					.then(data => {
-						if (data.success === false) {
-							alert(data.error);
+						if (data.status === "confirm") {
+							status.textContent = "PIN saved. Now confirm.";
+							setTimeout(() => window.location.reload(), 1500);
+						} else if (data.status === "saved") {
+							status.textContent = "PIN confirmed. Redirecting...";
+							setTimeout(() => window.location.href = data.next, 1000);
+						} else if (data.status === "mismatch") {
+							status.textContent = "PINs didn’t match. Try again.";
+							setTimeout(() => window.location.reload(), 1500);
+						} else if (data.success === false) {
+							status.textContent = data.error || "Incorrect PIN.";
 							clear();
-						} else {
-							window.location.href = data.next;
+						} else if (data.success === true) {
+							status.textContent = "Access granted ✅";
+							setTimeout(() => window.location.href = data.next, 1000);
 						}
 					});
 				}
@@ -53,6 +58,3 @@ initPinScreen("#mainPinScreen", (pin, clear) => {
 	console.log(`Entered Pin: ${pin}`);
 	clear();
 });
-
-// ============== PATTERN LOCK ===============
-

@@ -17,6 +17,8 @@
 	<title> Pin Screen </title>
 	<link rel="stylesheet" href="static/style.css">
 	<script type="module" src="static/main.js"></script>
+	<script src="{{ url_for('static', filename='timer.js') }}"></script>
+
 </head>
 <body>
 
@@ -43,6 +45,8 @@
 			</button>
 		</div>
 	</div>
+
+	<p id="statusMsg" class="center"></p>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 	<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
@@ -73,6 +77,8 @@
 			</button>
 		</div>
 	</div>
+
+	<p id="statusMsg" class="center"></p>
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 	<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>

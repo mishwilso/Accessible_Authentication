@@ -1,5 +1,8 @@
 from flask import Flask, render_template, redirect, url_for, session, request, jsonify
 import random
+import csv
+import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -12,8 +15,24 @@ patternLogin = ""
 
 ORDERED_MATCH = False
 
+def log_time_to_csv(method, phase, time_taken):
+    log_path = "password_timings.csv"
+    session_id = session.get('user_id', request.remote_addr)
+    timestamp = datetime.now().isoformat()
+
+    row = [method, timestamp, session_id, phase, time_taken]
+
+    file_exists = os.path.exists(log_path)
+    with open(log_path, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(["method", "timestamp", "session_id", "phase", "time_taken_sec"])
+        writer.writerow(row)
+
+
 @app.route('/')
 def index():
+    session.clear()
     session['visited'] = []
     session['distractors'] = []
     return render_template('index.html')
@@ -48,97 +67,71 @@ def done():
 
 @app.route('/pin')
 def pin():
-    # Phase can be "create" or "validate"
-    phase = session.get('phase', 'create')
-    return render_template('pin.html', login=(phase == 'validate'))
+    phase = session.get('pin_phase', 'create')
+    return render_template('pin.html', login=(phase == 'login'))
 
 @app.route('/submit_pin', methods=['POST'])
 def submit_pin():
     data = request.json
     pin = data.get('pin')
-    print(f"PIN: {pin}")
+    time_taken = data.get("time_taken")
+    phase = session.get("pin_phase", "create")
+    log_time_to_csv("pin", phase, time_taken)
 
-    phase = session.get('phase', 'create')
-
-    if phase == 'create':
-        # Store and move to delay
+    if phase == "create":
         session['pin'] = pin
-        session['phase'] = 'validate'
-        session['video'] = random.choice(list(delay_pages))
-        return jsonify({'next': url_for('delay')})
+        session['pin_phase'] = 'confirm'
+        return jsonify({'status': 'confirm'})
 
-    elif phase == 'validate':
+    elif phase == "confirm":
         if pin == session.get('pin'):
-            # Clear PIN and phase after successful login
-            print("Good job! Pin success :)")
+            session['pin_phase'] = 'login'
+            return jsonify({'status': 'saved', 'next': url_for('delay')})
+        else:
+            session['pin_phase'] = 'create'
+            return jsonify({'status': 'mismatch'})
+
+    elif phase == 'login':
+        if pin == session.get('pin'):
             return jsonify({'success': True, 'next': url_for('go_to_next')})
         else:
-            print("Sorry! Pin failure :'(")
             return jsonify({'success': False, 'error': 'Incorrect PIN'})
 
 @app.route('/pattern')
 def pattern():
-    phase = session.get('phase', 'create')
-    return render_template('pattern.html', login=(phase == 'validate'))
+    phase = session.get('pattern_phase', 'create')
+    return render_template('pattern.html', phase=phase)
 
 @app.route('/submit_pattern', methods=['POST'])
 def submit_pattern():
     data = request.json
     pattern = data.get('pattern')
-    phase = session.get('phase', 'create')
+    time_taken = data.get("time_taken")
+    phase = session.get('pattern_phase', 'create')
+    log_time_to_csv("pattern", phase, time_taken)
 
     if phase == 'create':
         session['pattern'] = pattern
-        session['phase'] = 'validate'
-        return jsonify({'status': 'saved', 'next': url_for('delay')})
+        session['pattern_phase'] = 'confirm'
+        return jsonify({'status': 'confirm'})
 
-    elif phase == 'validate':
+    elif phase == 'confirm':
+        if pattern == session.get('pattern'):
+            session['pattern_phase'] = 'login'
+            return jsonify({'status': 'saved', 'next': url_for('delay')})
+        else:
+            session['pattern_phase'] = 'create'
+            return jsonify({'status': 'mismatch'})
+
+    elif phase == 'login':
         if pattern == session.get('pattern'):
             return jsonify({'success': True, 'next': url_for('reset_pattern')})
         else:
             return jsonify({'success': False, 'error': 'Incorrect pattern. Try again.'})
 
-@app.route("/submit_image_login", methods=["POST"])
-def submit_image_login():
-    data = request.json
-    attempt = data.get("sequence")
-    correct = session.get("image_password", [])
-
-    if ORDERED_MATCH:
-        is_correct = attempt == correct
-    else:
-        is_correct = set(attempt) == set(correct)
-
-    if is_correct:
-        return jsonify({"success": True, "next": url_for("go_to_next")})
-    else:
-        return jsonify({"success": False, "message": "Incorrect images selected"})
-
-
-@app.route("/submit_image_password", methods=["POST"])
-def submit_image_password():
-    data = request.json
-    sequence = list(map(str, data.get("sequence")))  # make sure they're strings
-    phase = session.get("phase", "create")
-
-    if phase == "create":
-        session["image_password"] = sequence
-        session["phase"] = "confirm"
-        return jsonify({"status": "confirm"})
-
-    elif phase == "confirm":
-        stored = session.get("image_password", [])
-        if set(sequence) == set(stored):  # unordered comparison
-            session["phase"] = "login"
-            return jsonify({"status": "saved", "next": url_for("delay")})
-        else:
-            session["phase"] = "create"
-            return jsonify({"status": "mismatch"})
-
-
 @app.route("/image_password")
 def image_password():
-    phase = session.get('phase', 'create')
+    phase = session.get('image_phase', 'create')
 
     if phase == 'login':
         correct = session.get("image_password", [])
@@ -170,6 +163,41 @@ def image_password():
         grid=grid,
         correct=session.get("image_password")
     )
+
+@app.route("/submit_image_login", methods=["POST"])
+def submit_image_login():
+    data = request.json
+    attempt = data.get("sequence")
+    correct = session.get("image_password", [])
+    time_taken = data.get("time_taken")
+    log_time_to_csv("image", "login", time_taken)
+
+    if set(attempt) == set(correct): 
+        return jsonify({"success": True, "next": url_for("go_to_next")})
+    return jsonify({"success": False, "message": "Incorrect images selected"})
+
+
+@app.route("/submit_image_password", methods=["POST"])
+def submit_image_password():
+    data = request.json
+    sequence = list(map(str, data.get("sequence")))# must be string!!
+    time_taken = data.get("time_taken")
+    phase = session.get("image_phase", "create")
+    log_time_to_csv("image", phase, time_taken)
+
+    if phase == "create":
+        session["image_password"] = sequence
+        session["image_phase"] = "confirm"
+        return jsonify({"status": "confirm"})
+
+    elif phase == "confirm":
+        stored = session.get("image_password", [])
+        if set(sequence) == set(stored): # unordered comparisons :D
+            session["image_phase"] = "login"
+            return jsonify({"status": "saved", "next": url_for("delay")})
+        else:
+            session["image_phase"] = "create"
+            return jsonify({"status": "mismatch"})
 
 @app.route('/delay')
 def delay():

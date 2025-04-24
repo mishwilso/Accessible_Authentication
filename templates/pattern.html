@@ -1,3 +1,15 @@
+<!-- /** To be filled later /
+/***************************************************************************************
+*    Title: <title of program/source code>
+*    Author: <author(s) names>
+*    Date: <date>
+*    Code version: <code version>
+*    Availability: <where it's located>
+*
+***************************************************************************************/
+-->
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,33 +17,21 @@
   <title>Pattern Lock</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" charset="utf-8"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='patternlock.min.css') }}">
+  <link rel="stylesheet" href="static/style.css">
   <script src="{{ url_for('static', filename='patternlock.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='timer.js') }}"></script>
+
+  
   <style>
     body {
+      margin: 40px;
+	    background: #009578;
       font-family: Arial, sans-serif;
       text-align: center;
       margin-top: 40px;
     }
+    
 
-    .msg {
-      font-weight: bold;
-      margin-top: 20px;
-    }
-
-    .next-btn {
-      display: none;
-      margin-top: 30px;
-    }
-
-    .next-btn button {
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-
-    #patternContainer {
-      width: 300px;
-      margin: 0 auto;
-    }
   </style>
 </head>
 <body>
@@ -67,46 +67,71 @@
   
 
   <script>
+    const phase = "{{ phase }}";
+
+
     let firstPattern = null;
-    let isCreating = {{ 'false' if login else 'true' }};
     let lock = new PatternLock("#lock", {
-      onPattern: function(pattern) {
+      onPattern: function (pattern) {
         const status = document.getElementById("statusMsg");
 
-        if (isCreating) {
+        if (phase === "create") {
           if (!firstPattern) {
             firstPattern = pattern;
             lock.clear();
             status.textContent = "Now draw the pattern again to confirm.";
           } else {
             if (firstPattern === pattern) {
-              // Pattern confirmed – save to server
               fetch("/submit_pattern", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ pattern })
+                body: JSON.stringify({
+                  pattern: pattern,
+                  time_taken: getElapsedTime()
+                })
               })
               .then(res => res.json())
               .then(data => {
-                if (data.success || data.status === 'saved') {
-					status.textContent = "Pattern saved";
-					const nextBtn = document.getElementById("nextBtn");
-					nextBtn.style.display = "block";
-					nextBtn.onclick = () => window.location.href = data.next; 
-					}
+                if (data.status === "confirm") {
+                  status.textContent = "Pattern saved. Now login.";
+                  setTimeout(() => window.location.href = "/pattern", 1000);
+                } else {
+                  status.textContent = "Something went wrong.";
+                }
               });
             } else {
-              status.textContent = "Patterns didn’t match. Please try again.";
               firstPattern = null;
+              status.textContent = "Patterns didn’t match. Try again.";
               lock.clear();
             }
           }
-        } else {
-          // Login validation phase
+        } else if (phase === "confirm") {
           fetch("/submit_pattern", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ pattern })
+            body: JSON.stringify({
+              pattern: pattern,
+              time_taken: getElapsedTime()
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            if (data.status === "saved") {
+              status.textContent = "Pattern saved. Proceeding...";
+              setTimeout(() => window.location.href = data.next, 1000);
+            } else if (data.status === "mismatch") {
+              status.textContent = "Mismatch. Try again.";
+              setTimeout(() => window.location.href = "/pattern", 1500);
+            }
+          });
+        } else if (phase === "login") {
+          fetch("/submit_pattern", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              pattern: pattern,
+              time_taken: getElapsedTime()
+            })
           })
           .then(res => res.json())
           .then(data => {
@@ -115,8 +140,8 @@
               setTimeout(() => window.location.href = data.next, 1000);
             } else {
               status.textContent = data.error || "Incorrect pattern";
+              lock.clear();
             }
-            lock.clear();
           });
         }
       }

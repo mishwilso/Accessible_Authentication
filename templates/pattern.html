@@ -64,21 +64,14 @@
     
   
 
-  <script>
-    const phase = "{{ phase }}";
-  
-    let firstPattern = null;
-    let lock = new PatternLock("#lock", {
-      onPattern: function (pattern) {
-        const status = document.getElementById("statusMsg");
-  
-        if (phase === "create") {
-          if (!firstPattern) {
-            firstPattern = pattern;
-            lock.clear();
-            status.textContent = "Now draw the pattern again to confirm.";
-          } else {
-            if (firstPattern === pattern) {
+      <script>
+        const phase = "{{ phase }}";
+      
+        let lock = new PatternLock("#lock", {
+          onPattern: function (pattern) {
+            const status = document.getElementById("statusMsg");
+      
+            if (phase === "create" || phase === "confirm") {
               fetch("/submit_pattern", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -90,57 +83,39 @@
               .then(res => res.json())
               .then(data => {
                 if (data.status === "confirm") {
-                  window.location.href = "/pattern";
-                } else {
-                  status.textContent = "Something went wrong.";
+                  window.location.href = "/pattern";  // Go to confirm phase
+                } else if (data.status === "saved") {
+                  window.location.href = data.next;   // Go to delay
+                } else if (data.status === "mismatch") {
+                  status.textContent = "Patterns didn’t match. Try again.";
+                  setTimeout(() => window.location.reload(), 1000);
+                } else if (data.success === false) {
+                  status.textContent = data.error || "Error occurred.";
                 }
               });
-            } else {
-              firstPattern = null;
-              status.textContent = "Patterns didn’t match. Try again.";
-              lock.clear();
+            } else if (phase === "login") {
+              fetch("/submit_pattern", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  pattern: pattern,
+                  time_taken: getElapsedTime()
+                })
+              })
+              .then(res => res.json())
+              .then(data => {
+                if (data.success) {
+                  window.location.href = data.next;
+                } else {
+                  status.textContent = data.error || "Incorrect pattern.";
+                  lock.clear();
+                }
+              });
             }
           }
-        } else if (phase === "confirm") {
-          fetch("/submit_pattern", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              pattern: pattern,
-              time_taken: getElapsedTime()
-            })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.status === "saved") {
-              window.location.href = data.next;
-            } else if (data.status === "mismatch") {
-              status.textContent = "Mismatch. Try again.";
-              setTimeout(() => window.location.href = "/pattern", 1500);
-            }
-          });
-        } else if (phase === "login") {
-          fetch("/submit_pattern", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              pattern: pattern,
-              time_taken: getElapsedTime()
-            })
-          })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              window.location.href = data.next;
-            } else {
-              status.textContent = data.error || "Incorrect pattern.";
-              lock.clear();
-            }
-          });
-        }
-      }
-    });
-  </script>
+        });
+      </script>
+      
   </div>
   </body>
   </html>

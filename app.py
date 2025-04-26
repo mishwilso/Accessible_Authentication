@@ -39,7 +39,7 @@ def is_strong_password(password):
 
 def log_time_to_csv(method, phase, time_taken, pass_length):
     log_path = "password_timings.csv"
-    participant_id = session.get('participant_id', 'unknown')
+    participant_id = session['participant_id']  
     timestamp = datetime.now().isoformat()
     errors = session.get('errors', {}).get((method, phase), 0)
 
@@ -85,6 +85,7 @@ def index():
     session.clear()
     session['visited'] = []
     session['distractors'] = []
+    session['participant_id'] = ''
     return render_template('index.html')
 
 
@@ -104,6 +105,11 @@ def go_to_next():
 @app.route('/final_survey')
 def final_survey():
     return render_template('final_survey.html', done=url_for('done'))    
+
+@app.route('/partic')
+def partic():
+    return session.get('participant_id', [])
+
 
 @app.route('/<page>')
 def navigate(page):
@@ -256,7 +262,8 @@ def image_password():
             print(correct)
             print(len(distractors))
             random.shuffle(distractors)
-            distractors = distractors[:11]
+
+            distractors = distractors[:(16 - len(correct))]
             session['distractors'] = distractors 
 
         print("################################################")
@@ -343,8 +350,10 @@ def delay():
 @app.route('/reset_pin')
 def reset_pin():
     visited = session['visited']
+    participant_id = session['participant_id']
     session.clear()
     session['visited'] = visited
+    session['participant_id'] = participant_id
     return redirect(url_for('pin'))
 
 
@@ -353,8 +362,10 @@ def reset_pin():
 @app.route('/reset_pattern')
 def reset_pattern():
     visited = session['visited']
+    participant_id = session['participant_id']
     session.clear()
     session['visited'] = visited
+    session['participant_id'] = participant_id
     return redirect(url_for('pattern'))
 
 
@@ -363,8 +374,10 @@ def reset_pattern():
 @app.route("/reset_image_password")
 def reset_image_password():
     visited = session['visited']
+    participant_id = session['participant_id']
     session.clear()
     session['visited'] = visited
+    session['participant_id'] = participant_id
     return redirect(url_for("image_password"))
 
 
@@ -372,6 +385,7 @@ def reset_image_password():
 def start_random():
     choice = random.choice(['page1', 'page2', 'page3'])
     visited = session.get('visited', [])
+
     visited.append(choice)
     session['visited'] = visited
 

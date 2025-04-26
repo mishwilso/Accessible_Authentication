@@ -31,19 +31,19 @@ const initPinScreen = (selector, onEnter) => {
 					.then(data => {
 						if (data.status === "confirm") {
 							status.textContent = "PIN saved. Now confirm.";
-							setTimeout(() => window.location.reload(), 1500);
+							setTimeout(() => window.location.reload(), 500);
 						} else if (data.status === "saved") {
 							status.textContent = "PIN confirmed. Redirecting...";
-							setTimeout(() => window.location.href = data.next, 1000);
+							setTimeout(() => window.location.href = data.next, 500);
 						} else if (data.status === "mismatch") {
 							status.textContent = "PINs didn’t match. Try again.";
-							setTimeout(() => window.location.reload(), 1500);
+							setTimeout(() => window.location.reload(), 500);
 						} else if (data.success === false) {
 							status.textContent = data.error || "Incorrect PIN.";
 							clear();
 						} else if (data.success === true) {
 							status.textContent = "Access granted ✅";
-							setTimeout(() => window.location.href = data.next, 1000);
+							setTimeout(() => window.location.href = data.next, 500);
 						}
 					});
 				}

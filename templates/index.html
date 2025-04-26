@@ -1,8 +1,72 @@
 <!DOCTYPE html>
-<html>
-<head><title>Start</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Accessible Password Study</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-    <h1>Welcome to the site</h1>
-    <a href="{{ url_for('go_to_next') }}">Start</a>
+  <div class="container">
+    <h1>Welcome to the Accessible Password Study</h1>
+
+    <div class="instructions">
+        <h3>Background</h3>
+        <p>
+          This study compares traditional text-based authentication methods (like PINs) with graphical authentication methods (like drawing patterns or selecting images).
+          We are especially interested in understanding how these methods work for neurodivergent individuals.
+        </p>
+        <p>
+          This study is about your experience—there are no right or wrong answers. Please try your best and let us know if anything is unclear or difficult.
+        </p>
+      
+        <h3>Instructions for the Session</h3>
+        <p>
+          You will complete three different authentication tasks using a website. Each task will follow the same structure:
+        </p>
+        <ul>
+          <li>Create your own password or pattern</li>
+          <li>Do a short unrelated activity</li>
+          <li>Use your password or pattern to log in</li>
+          <li>Complete a short survey reflecting on that experience</li>
+        </ul>
+      
+        <p>The tasks will include:</p>
+        <ul>
+          <li>A text-based PIN login</li>
+          <li>A pattern lock system</li>
+          <li>An image-based sequence login</li>
+        </ul>
+      
+        <p>
+          The order of these tasks will be randomized for each participant.
+          You are encouraged to <strong>think aloud</strong> during each task—this means saying your thoughts or feelings out loud as you go. This helps us understand your experience better.
+          If anything is confusing or doesn’t work as expected, please let the facilitator know.
+        </p>
+      
+</div>
+    <div class="container">
+    <form action="{{ url_for('save_demographics') }}" method="post" class="center" style="margin-top: 30px;">
+      <h2>Before We Begin</h2>
+      <p>Please fill in the following:</p>
+
+      <label>Name:</label><br>
+      <input type="text" name="name" required><br><br>
+
+      <label>Age:</label><br>
+      <input type="number" name="age" required><br><br>
+
+      <label>Gender Identity:</label><br>
+      <input type="text" name="gender" required><br><br>
+
+      <label>Pronouns:</label><br>
+      <input type="text" name="pronouns"><br><br>
+
+      <label>Do you have any accessibility needs?</label><br>
+      <textarea name="accessibility" rows="3"></textarea><br><br>
+
+      <button class="button" type="submit">Start Study</button>
+    </form>
+    </div>
+  </div>
 </body>
 </html>

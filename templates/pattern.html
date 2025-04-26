@@ -9,72 +9,69 @@
 ***************************************************************************************/
 -->
 
-
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Pattern Lock</title>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" charset="utf-8"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='patternlock.min.css') }}">
-  <link rel="stylesheet" href="static/style.css">
-  <script src="{{ url_for('static', filename='patternlock.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='timer.js') }}"></script>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Pattern Lock</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" charset="utf-8"></script>
 
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='patternlock.min.css') }}">
+
+    <script src="{{ url_for('static', filename='patternlock.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='timer.js') }}"></script>
   
-  <style>
-    body {
-      margin: 40px;
-	    background: #009578;
-      font-family: Arial, sans-serif;
-			text-align: center;
-      margin-top: 40px;
-    }
+      <style>
+        
+        #patternContainer { width: 300px; margin: 0 auto; }
+      </style>
+  </head>
+  <body>
+    <div class="container">
+      {% if phase == "create" %}
+        <h1>Create Your Pattern</h1>
+        <p>Draw a pattern by connecting at least 4 dots. Then confirm it.</p>
+      {% elif phase == "confirm" %}
+        <h1>Confirm Your Pattern</h1>
+        <p>Draw the same pattern again to confirm.</p>
+      {% else %}
+        <h1>Login Using Your Pattern</h1>
+        <p>Please draw your previously created pattern.</p>
+      {% endif %}
+  
+      <div id="patternContainer">
+        <svg class="patternlock" id="lock" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+          <g class="lock-actives"></g>
+          <g class="lock-lines"></g>
+          <g class="lock-dots">
+            {% for y in [20, 50, 80] %}
+              {% for x in [20, 50, 80] %}
+                <circle cx="{{ x }}" cy="{{ y }}" r="2"/>
+              {% endfor %}
+            {% endfor %}
+          </g>
+        </svg>
+      </div>
+  
+      <p id="statusMsg" class="center"></p>
+  
+      {% if phase == "login" %}
+        <div class="buttons">
+          <a class="button" href="{{ url_for('go_to_next') }}">Skip to Next Survey</a>
+        </div>
+      {% endif %}
     
-
-  </style>
-</head>
-<body>
-
-  {% if login == False %}
-    <h2>Create Your Pattern</h2>
-    <p>Draw a pattern, then repeat it to confirm.</p>
-  {% else %}
-    <h2>Enter Your Pattern to Login</h2>
-    <p>Please draw the pattern you set earlier.</p>
-    <a href="{{ url_for('go_to_next') }}">Go to next survey incase you don't remember the Pattern</a>
-  {% endif %}
-
-  <div id="patternContainer">
-    <svg class="patternlock" id="lock" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-      <g class="lock-actives"></g>
-      <g class="lock-lines"></g>
-      <g class="lock-dots">
-        {% for y in [20, 50, 80] %}
-          {% for x in [20, 50, 80] %}
-            <circle cx="{{ x }}" cy="{{ y }}" r="2"/>
-          {% endfor %}
-        {% endfor %}
-      </g>
-    </svg>
-  </div>
-
-  <div class="msg" id="statusMsg"></div>
-
-  <div class="next-btn" id="nextBtn">
-	<button>Continue</button>
-  </div>
   
 
   <script>
     const phase = "{{ phase }}";
-
-
+  
     let firstPattern = null;
     let lock = new PatternLock("#lock", {
       onPattern: function (pattern) {
         const status = document.getElementById("statusMsg");
-
+  
         if (phase === "create") {
           if (!firstPattern) {
             firstPattern = pattern;
@@ -93,8 +90,7 @@
               .then(res => res.json())
               .then(data => {
                 if (data.status === "confirm") {
-                  status.textContent = "Pattern saved. Now login.";
-                  setTimeout(() => window.location.href = "/pattern", 1000);
+                  window.location.href = "/pattern";
                 } else {
                   status.textContent = "Something went wrong.";
                 }
@@ -117,8 +113,7 @@
           .then(res => res.json())
           .then(data => {
             if (data.status === "saved") {
-              status.textContent = "Pattern saved. Proceeding...";
-              setTimeout(() => window.location.href = data.next, 1000);
+              window.location.href = data.next;
             } else if (data.status === "mismatch") {
               status.textContent = "Mismatch. Try again.";
               setTimeout(() => window.location.href = "/pattern", 1500);
@@ -136,10 +131,9 @@
           .then(res => res.json())
           .then(data => {
             if (data.success) {
-              status.textContent = "Access granted";
-              setTimeout(() => window.location.href = data.next, 1000);
+              window.location.href = data.next;
             } else {
-              status.textContent = data.error || "Incorrect pattern";
+              status.textContent = data.error || "Incorrect pattern.";
               lock.clear();
             }
           });
@@ -147,7 +141,6 @@
       }
     });
   </script>
-
-
-</body>
-</html>
+  </div>
+  </body>
+  </html>

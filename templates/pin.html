@@ -1,92 +1,97 @@
-<!-- /** To be filled later /
-/***************************************************************************************
-*    Title: <title of program/source code>
-*    Author: <author(s) names>
-*    Date: <date>
-*    Code version: <code version>
-*    Availability: <where it's located>
-*
-***************************************************************************************/
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title> Pin Screen </title>
-	<link rel="stylesheet" href="static/style.css">
-	<script type="module" src="static/main.js"></script>
-	<script src="{{ url_for('static', filename='timer.js') }}"></script>
+  <meta charset="UTF-8">
+  <title>PIN Entry</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script type="module" src="{{ url_for('static', filename='main.js') }}"></script>
+  <script src="{{ url_for('static', filename='timer.js') }}"></script>
+  <style>
+    .pin-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
 
+    .pin-value {
+      font-size: 2em;
+      padding: 0px;
+      width: 200px;
+      text-align: center;
+      margin-bottom: 0px;
+    }
+
+    .pin-keyboard {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .pin-keyboard-key {
+      background-color: #43a047;
+      color: white;
+      font-size: 24px;
+      padding: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .pin-keyboard-key:hover {
+      background-color: #388e3c;
+    }
+
+    .pin-divider {
+      width: 100%;
+      max-width: 220px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+    }
+  </style>
 </head>
 <body>
-
+  <div class="container">
     {% if login == False %}
-    <div id="mainPinScreen" class="pin-screen">
-		<input type="password" class="pin-value" readonly>
-		<hr class="pin-divider">
-		<div class="pin-keyboard">
-			<button type="button" class="pin-keyboard-key">1</button>
-			<button type="button" class="pin-keyboard-key">2</button>
-			<button type="button" class="pin-keyboard-key">3</button>
-			<button type="button" class="pin-keyboard-key">4</button>
-			<button type="button" class="pin-keyboard-key">5</button>
-			<button type="button" class="pin-keyboard-key">6</button>
-			<button type="button" class="pin-keyboard-key">7</button>
-			<button type="button" class="pin-keyboard-key">8</button>
-			<button type="button" class="pin-keyboard-key">9</button>
-			<button type="button" class="pin-keyboard-key pin-keyboard-key--clear">
-				<ion-icon name="close-outline"></ion-icon>
-			</button>
-			<button type="button" class="pin-keyboard-key">0</button>
-			<button type="button" class="pin-keyboard-key pin-keyboard-key--enter">
-				<ion-icon name="arrow-forward-circle-outline"></ion-icon>
-			</button>
-		</div>
-	</div>
-
-	<p id="statusMsg" class="center"></p>
-
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-	<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-
+      <h1>Create Your PIN</h1>
+      <p>Please create a 4-digit PIN and confirm it.</p>
     {% else %}
-    
-    <p>Please re-enter your previously set PIN</p>
-
-	<div id="mainPinScreen" class="pin-screen">
-		<input type="password" class="pin-value" readonly>
-		<hr class="pin-divider">
-		<div class="pin-keyboard">
-			<button type="button" class="pin-keyboard-key">1</button>
-			<button type="button" class="pin-keyboard-key">2</button>
-			<button type="button" class="pin-keyboard-key">3</button>
-			<button type="button" class="pin-keyboard-key">4</button>
-			<button type="button" class="pin-keyboard-key">5</button>
-			<button type="button" class="pin-keyboard-key">6</button>
-			<button type="button" class="pin-keyboard-key">7</button>
-			<button type="button" class="pin-keyboard-key">8</button>
-			<button type="button" class="pin-keyboard-key">9</button>
-			<button type="button" class="pin-keyboard-key pin-keyboard-key--clear">
-				<ion-icon name="close-outline"></ion-icon>
-			</button>
-			<button type="button" class="pin-keyboard-key">0</button>
-			<button type="button" class="pin-keyboard-key pin-keyboard-key--enter">
-				<ion-icon name="arrow-forward-circle-outline"></ion-icon>
-			</button>
-		</div>
-	</div>
-
-	<p id="statusMsg" class="center"></p>
-
-    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-	<script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-
-
-    <a href="{{ url_for('go_to_next') }}">Go to next survey incase you don't remember the PIN unvisited page</a>
-
+      <h1>Enter Your PIN</h1>
+      <p>Please re-enter your previously set PIN to login.</p>
     {% endif %}
 
+    <div id="mainPinScreen" class="pin-screen">
+      <input type="password" class="pin-value" readonly>
+      <hr class="pin-divider">
+      <div class="pin-keyboard">
+        {% for number in [1,2,3,4,5,6,7,8,9,"clear",0,"enter"] %}
+          {% if number == "clear" %}
+            <button type="button" class="pin-keyboard-key pin-keyboard-key--clear">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+          {% elif number == "enter" %}
+            <button type="button" class="pin-keyboard-key pin-keyboard-key--enter">
+              <ion-icon name="arrow-forward-circle-outline"></ion-icon>
+            </button>
+          {% else %}
+            <button type="button" class="pin-keyboard-key">{{ number }}</button>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <p id="statusMsg" class="center"></p>
+
+    {% if login %}
+      <div class="buttons">
+        <a class="button" href="{{ url_for('go_to_next') }}">Skip to Next Survey</a>
+      </div>
+    {% endif %}
+  </div>
+
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </body>
 </html>

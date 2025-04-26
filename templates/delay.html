@@ -1,14 +1,25 @@
 <!DOCTYPE html>
-<html>
-<head><title>Start</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delay</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-    <h1>This is where a delay will happen! I'm thinking we have an array of short videos or something? I dunno...</h1>
-    <div>
-        <video width="480" height="600" controls>
-            <source src="static/{{ video }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+  <div class="container">
+    <h1>Break Time!</h1>
+    <p>Watch this short video before proceeding to the next step.</p>
+
+    <div class="center">
+      <video width="480" height="600" controls>
+        <source src="static/{{ video }}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
     </div>
-    <a href="{{ return_url }}">Re-Enter Password</a>
+
+    <div class="buttons">
+      <a class="button" href="{{ return_url }}">Continue</a>
+    </div>
+  </div>
 </body>
 </html>

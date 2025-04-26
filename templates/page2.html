@@ -1,16 +1,24 @@
 <!DOCTYPE html>
-<html>
-<head><title>Page 2</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pattern-Based Authentication</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-    <h1>Pattern-based Authentication</h1>
-    <p>Goal: Evaluate the usability and intuitiveness of a pattern-based authentication system. </p>
-    <p>Procedure:</p>
+  <div class="container">
+    <h1>Pattern-Based Authentication</h1>
+    <p><strong>Goal:</strong> Evaluate the usability and intuitiveness of a pattern-based authentication system.</p>
+    <p><strong>Procedure:</strong></p>
     <ul>
-        <li>Participants are shown a 3x3 grid (similar to Android pattern lock).</li>
-        <li>They create a pattern and confirm it.</li>
-        <li>After a delay task, they must redraw the same pattern to gain access.</li>
-        <li>Time, error rate, and number of attempts will be recorded.</li>
+      <li>Participants are shown a 3x3 grid (similar to Android pattern lock).</li>
+      <li>They create a pattern and confirm it.</li>
+      <li>After a delay task, they must redraw the same pattern to gain access.</li>
+      <li>Time, error rate, and number of attempts will be recorded.</li>
     </ul>
-    <a href="{{ url_for('reset_pattern') }}">Go to Pattern Login</a>
+    <div class="buttons">
+      <a class="button" href="{{ url_for('reset_pattern') }}">Start Pattern Authentication</a>
+    </div>
+  </div>
 </body>
 </html>

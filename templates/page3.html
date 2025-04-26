@@ -1,16 +1,24 @@
 <!DOCTYPE html>
-<html>
-<head><title>Page 3</title></head>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Sequence Authentication</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
 <body>
-    <h1> Image Sequence Authentication</h1>
-    <p>Goal: Evaluate the usability and intuitiveness of image-based authentication.</p>
-    <p>Procedure:</p>
+  <div class="container">
+    <h1>Image Sequence Authentication</h1>
+    <p><strong>Goal:</strong> Evaluate the usability and intuitiveness of image-based authentication.</p>
+    <p><strong>Procedure:</strong></p>
     <ul>
-        <li>Participants are shown a grid of images.</li>
-        <li>They select a sequence of 3–5 images to use as their password.</li>
-        <li>After a delay task, they are asked to reselect the images in the same order.</li>
-        <li>Time, error rate, and number of attempts will be recorded.</li>
+      <li>Participants are shown a grid of images.</li>
+      <li>They select a sequence of at least 4 images to use as their password.</li>
+      <li>After a delay task, they are asked to reselect the images in the same set.</li>
+      <li>Time, error rate, and number of attempts will be recorded.</li>
     </ul>
-    <a href="{{ url_for('reset_image_password') }}">Go to next random unvisited page</a>
+    <div class="buttons">
+      <a class="button" href="{{ url_for('reset_image_password') }}">Start Image Authentication</a>
+    </div>
+  </div>
 </body>
 </html>

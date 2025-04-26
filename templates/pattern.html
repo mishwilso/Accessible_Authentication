@@ -55,6 +55,12 @@
       </div>
   
       <p id="statusMsg" class="center"></p>
+      
+      {% if phase != "login" %}
+      <div class="buttons">
+        <a class="button" href="{{ url_for('reset_pattern') }}">Reset Pattern</a>
+      </div>
+      {% endif %}
   
       {% if phase == "login" %}
         <div class="buttons">
@@ -72,6 +78,11 @@
             const status = document.getElementById("statusMsg");
       
             if (phase === "create" || phase === "confirm") {
+              if (pattern.toString().length < 4) {
+                status.textContent = "Must be at least 4 dots.";
+                // setTimeout(() => window.location.reload(), 500);
+              } 
+
               fetch("/submit_pattern", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -88,7 +99,7 @@
                   window.location.href = data.next;   // Go to delay
                 } else if (data.status === "mismatch") {
                   status.textContent = "Patterns didn’t match. Try again.";
-                  setTimeout(() => window.location.reload(), 1000);
+                  window.location.reload();
                 } else if (data.success === false) {
                   status.textContent = data.error || "Error occurred.";
                 }

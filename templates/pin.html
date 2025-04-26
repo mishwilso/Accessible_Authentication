@@ -84,6 +84,13 @@
 
     <p id="statusMsg" class="center"></p>
 
+
+    {% if phase != "login" %}
+      <div class="buttons">
+        <a class="button" href="{{ url_for('reset_pin') }}">Reset Pin</a>
+      </div>
+    {% endif %}
+
     {% if login %}
       <div class="buttons">
         <a class="button" href="{{ url_for('go_to_next') }}">Skip to Next Survey</a>

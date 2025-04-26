@@ -11,8 +11,8 @@ import re
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-inner_pages = {'page1', 'page2', 'page3'}
-delay_pages = { 'video1.mp4', 'video2.mp4', 'video3.mp4'}
+inner_pages = {'page1', 'page2', 'page3', 'page4'}
+delay_pages = { 'video1.mp4', 'video2.mp4', 'video3.mp4', 'video4.mp4'}
 
 pinLogin = ""
 patternLogin = ""
@@ -86,6 +86,7 @@ def index():
     session['visited'] = []
     session['distractors'] = []
     session['participant_id'] = ''
+    session['video'] = []
     return render_template('index.html')
 
 
@@ -210,6 +211,7 @@ def submit_pattern():
     key = (method, phase)
 
     pattern_str = str(pattern)
+
     if len(pattern_str) < 4:
         session['errors'][key] = session['errors'].get(key, 0) + 1
         return jsonify({'success': False, 'error': 'Pattern must be at least 4 dots'})
@@ -218,7 +220,6 @@ def submit_pattern():
 
     if phase == 'create':
         session['pattern'] = pattern
-        session['video'] = random.choice(list(delay_pages))
         session['pattern_phase'] = 'confirm'
         log_time_to_csv(method, phase, time_taken, len(pattern_str))
         return jsonify({'status': 'confirm'})
@@ -229,14 +230,15 @@ def submit_pattern():
             log_time_to_csv(method, phase, time_taken, len(pattern_str))
             return jsonify({'status': 'saved', 'next': url_for('delay')})
         else:
+            print('reset page')
             session['errors'][key] = session['errors'].get(key, 0) + 1
             session['pattern_phase'] = 'create'
-            return jsonify({'status': 'mismatch'})
+            return jsonify({'status': 'mismatch', 'next': url_for('reset_pattern')})
 
     elif phase == 'login':
         if pattern == session.get('pattern'):
             log_time_to_csv(method, phase, time_taken, len(pattern_str))
-            return jsonify({'success': True, 'next': url_for('reset_pattern')})
+            return jsonify({'success': True, 'next': url_for('go_to_next')})
         else:
             session['errors'][key] = session['errors'].get(key, 0) + 1
             return jsonify({'success': False, 'error': 'Incorrect pattern. Try again.'})
@@ -340,9 +342,17 @@ def submit_image_password():
 
 @app.route('/delay')
 def delay():
-    mp4 = session.get('video')
+    visited = session.get('video')
+    unvisited = list(delay_pages - set(visited))
+
+    video = random.choice(list(unvisited))
+    visited.append(video)
+    session['video'] = visited
+
+    print(session['video'])
+
     referrer = request.referrer or url_for('pin')
-    return render_template('delay.html', video=mp4, return_url=referrer)
+    return render_template('delay.html', video=video, return_url=referrer)
 
 
 
@@ -351,9 +361,11 @@ def delay():
 def reset_pin():
     visited = session['visited']
     participant_id = session['participant_id']
+    video = session['video']
     session.clear()
     session['visited'] = visited
     session['participant_id'] = participant_id
+    session['video'] = video
     return redirect(url_for('pin'))
 
 
@@ -363,9 +375,11 @@ def reset_pin():
 def reset_pattern():
     visited = session['visited']
     participant_id = session['participant_id']
+    video = session['video']
     session.clear()
     session['visited'] = visited
     session['participant_id'] = participant_id
+    session['video'] = video
     return redirect(url_for('pattern'))
 
 
@@ -375,9 +389,11 @@ def reset_pattern():
 def reset_image_password():
     visited = session['visited']
     participant_id = session['participant_id']
+    video = session['video']
     session.clear()
     session['visited'] = visited
     session['participant_id'] = participant_id
+    session['video'] = video
     return redirect(url_for("image_password"))
 
 

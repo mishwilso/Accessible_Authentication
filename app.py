@@ -158,49 +158,6 @@ def submit_pattern():
             return jsonify({'success': False, 'error': 'Incorrect pattern. Try again.'})
 
 
-
-
-@app.route("/submit_image_login", methods=["POST"])
-def submit_image_login():
-    data = request.json
-    attempt = data.get("sequence")
-    correct = session.get("image_password", [])
-
-    if ORDERED_MATCH:
-        is_correct = attempt == correct
-    else:
-        is_correct = set(attempt) == set(correct)
-
-    if is_correct:
-        return jsonify({"success": True, "next": url_for("go_to_next")})
-    else:
-        return jsonify({"success": False, "message": "Incorrect images selected"})
-
-
-
-@app.route("/submit_image_password", methods=["POST"])
-def submit_image_password():
-    data = request.json
-    sequence = list(map(str, data.get("sequence")))  # make sure they're strings
-    phase = session.get("phase", "create")
-
-    if phase == "create":
-        session["image_password"] = sequence
-        session["phase"] = "confirm"
-        return jsonify({"status": "confirm"})
-
-    elif phase == "confirm":
-        stored = session.get("image_password", [])
-        if set(sequence) == set(stored):  # unordered comparison
-            session["phase"] = "login"
-            session['video'] = random.choice(list(delay_pages))
-            return jsonify({"status": "saved", "next": url_for("delay")})
-        else:
-            session["phase"] = "create"
-            return jsonify({"status": "mismatch"})
-
-
-
 @app.route("/image_password")
 def image_password():
     phase = session.get('image_phase', 'create')
